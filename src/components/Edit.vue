@@ -1,7 +1,7 @@
 <template>
     <el-container>
             <!-- 侧边栏 -->
-    <el-aside width="200px">
+    <el-aside width="15%">
       <!-- 侧边栏菜单区 -->
       <el-menu default-active="2" active-text-color="#409EFF">
         <!-- 一级菜单 -->
@@ -13,26 +13,12 @@
           <!-- 文本 -->
           <span>{{item.authName}}</span>
         </template>
-          <!-- 二级菜单 -->
-          <el-menu-item index="subItem.id" v-for="subItem in item.children"
-          :key="subItem.id">
-            <!-- 图标 -->
-            <i class="el-icon-location"></i>
-            <!-- 文本 -->
-            <span>{{subItem.authName}}</span>
-          </el-menu-item>
         </el-submenu>
-        <el-menu-item index="1">处理中心</el-menu-item>
     </el-menu>
     </el-aside>
     <!-- 右侧内容主题 -->
     <el-main>
-        <div v-for="form in forms" :key="form.id">
-
-            {{form.title}}
-        </div>
-
-main
+        <router-view></router-view>
     </el-main>
     </el-container>
 </template>
@@ -71,6 +57,7 @@ export default {
 
 .el-aside {
     border: 1px solid #eee;
+    background-color:"#ABD4ED";
 }
 .el-main {
     border: 1px solid #eee

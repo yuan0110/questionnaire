@@ -5,6 +5,7 @@
             <div class="avatar_box">
                 <img src="../assets/logo.png" alt="">
             </div>
+            <span >问卷管理系统</span>
             <!-- 登陆表单区域 -->
             <el-form ref="loginFormRef" :model="loginForm" :rules="loginFormRules" label-width="0px" class="login_form">
                 <!-- 用户名 -->
@@ -32,7 +33,7 @@ export default {
       // 登录表单数据绑定对象
       loginForm: {
         username: '123',
-        password: '321'
+        password: '321321'
       },
       // 表单验证规则对象
       loginFormRules: {
@@ -58,7 +59,7 @@ export default {
     login () {
       this.$refs.loginFormRef.validate(async valid => {
         if (!valid) return
-        const res = await this.$http.post('myHelloWorld', this.loginForm)
+        const res = await this.$http.post('login', this.loginForm)
         if (res.status !== 200) return this.$message.error('登陆失败')
         this.$message.success('登陆成功')
         console.log(res)
@@ -73,6 +74,13 @@ export default {
 </script>
 
 <style lang="less" scoped>
+span{
+  font-size:100%;
+  text-align: center;
+  position: absolute;
+  top: 28%;
+  width:100%;
+}
 .login_container{
     background-color: #2b4b6b;
     height: 100%;
