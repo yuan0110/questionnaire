@@ -1,11 +1,11 @@
 <template>
 <el-row >
-    <el-card  v-for="q in question" :key="q.id" class="box-card" shadow="hover">
+    <el-card  v-for="(q, index) in question" :key="q.id" class="box-card" shadow="hover">
   <div slot="header" class="clearfix">
     <span>{{q.name}}</span>
     <el-button style="float: right; padding: 3px 0; margin:0 2px" type="text">删除</el-button>
     <el-button style="float: right; padding: 3px 0; margin:0 2px" type="text">发布</el-button>
-    <el-button style="float: right; padding: 3px 0; margin:0 2px" type="text">编辑</el-button>
+    <el-button style="float: right; padding: 3px 0; margin:0 2px" type="text" @click="edit(index)">编辑</el-button>
   </div>
   <div class="text item">
     {{'状态 ' + q.status }}
@@ -35,6 +35,14 @@ export default {
     logout () {
       window.sessionStorage.clear()
       this.$router.push('/login')
+    },
+    edit (index) {
+      this.$router.push({
+        path: '/edit',
+        query: {
+          choose: index
+        }
+      })
     }
 
   }

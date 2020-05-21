@@ -7,7 +7,7 @@
             </div>
             <span >问卷管理系统</span>
             <!-- 登陆表单区域 -->
-            <el-form ref="loginFormRef" :model="loginForm" :rules="loginFormRules" label-width="0px" class="login_form">
+            <el-form ref="loginFormRef" :model="loginForm" :rules="loginFormRules" label-width="0px" class="login_form" >
                 <!-- 用户名 -->
                 <el-form-item prop="username">
                     <el-input v-model="loginForm.username" prefix-icon="iconfont icon-user"></el-input>
@@ -61,7 +61,7 @@ export default {
         if (!valid) return
         const res = await this.$http.post('login', this.loginForm)
         if (res.status !== 200) return this.$message.error('登陆失败')
-        this.$message.success('登陆成功')
+        this.$message.success({ message: '登陆成功', duration: 1000 })
         console.log(res)
         window.sessionStorage.setItem('token', res.data.token)
         // 跳转到后台主页

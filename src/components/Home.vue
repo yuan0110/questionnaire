@@ -6,7 +6,7 @@
         <img src="../assets/logo2.png" alt="">
         <span>问卷平台</span>
       </div>
-      <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" :router="true">
+      <el-menu :default-active="$route.path" class="el-menu-demo" mode="horizontal" :router="true">
         <el-menu-item index="/mine">我的问卷</el-menu-item>
         <el-menu-item index="/welcome">客服中心</el-menu-item>
      </el-menu>
