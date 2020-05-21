@@ -1,11 +1,20 @@
 <template>
 <el-row >
-    <el-card  v-for="(q, index) in question" :key="q.id" class="box-card" shadow="hover">
+  <el-card style="text-align:center" class="box-card" shadow="hover">
+  <el-button type="text" @click='create()'>+新建</el-button>
+  <div class="text item">
+    无模板
+  </div>
+  <div class="text item">
+    三种题型：单选、多选、文本框
+  </div>
+</el-card>
+    <el-card  v-for="(q,index) in question" :key="q.id" class="box-card" shadow="hover">
   <div slot="header" class="clearfix">
     <span>{{q.name}}</span>
-    <el-button style="float: right; padding: 3px 0; margin:0 2px" type="text">删除</el-button>
-    <el-button style="float: right; padding: 3px 0; margin:0 2px" type="text">发布</el-button>
-    <el-button style="float: right; padding: 3px 0; margin:0 2px" type="text" @click="edit(index)">编辑</el-button>
+    <i style="float: right; padding: 3px 0; margin:0 2px" class="el-icon-delete" @click='del(index)'></i>
+    <i style="float: right; padding: 3px 0; margin:0 2px" class="el-icon-s-promotion" @click='changestatus(index)'></i>
+    <i style="float: right; padding: 3px 0; margin:0 2px" class="el-icon-edit" @click="edit(index)"></i>
   </div>
   <div class="text item">
     {{'状态 ' + q.status }}
@@ -23,7 +32,7 @@ export default {
   data () {
     return {
       question: [
-        { id: 'sdfds', name: '问卷一', status: '发布中', time: '2020-5-20 12:00' },
+        { id: 'sdfds', name: '问卷一', status: '未发布', time: '2020-5-20 12:00' },
         { id: 's', name: '问卷二', status: '已截止', time: '2020-5-20 12:00' }
       ]
     }
@@ -36,6 +45,14 @@ export default {
       window.sessionStorage.clear()
       this.$router.push('/login')
     },
+    del (index) {
+      this.question.splice(index, 1)
+    },
+    changestatus (index) {
+      if (this.question[index].status === '未发布') {
+        this.question[index].status = '已发布'
+      }
+    },
     edit (index) {
       this.$router.push({
         path: '/edit',
@@ -43,10 +60,13 @@ export default {
           choose: index
         }
       })
+    },
+    create (index) {
+      this.$router.push({
+        path: '/edit' // 跳转路由
+      })
     }
-
   }
-
 }
 </script>
 <style>

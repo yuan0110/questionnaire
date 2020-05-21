@@ -101,7 +101,15 @@ export default {
     },
     resetForm (formName) {
       this.$refs[formName].resetFields()
+    },
+    getParams () {
+      console.log(this.$router)
+      // this.msg = this.$route.params.data
     }
+  },
+  created () {
+    var self = this
+    self.getParams()
   }
 }
 </script>

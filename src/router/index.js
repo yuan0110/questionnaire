@@ -6,7 +6,7 @@ import Welcome from '../components/Welcome.vue'
 // import Create from '../components/Create.vue'
 import Mine from '../components/Mine.vue'
 import Edit from '../components/Edit.vue'
-// import Myform from '../components/Myform.vue'
+import Myform from '../components/Myform.vue'
 
 Vue.use(VueRouter)
 
@@ -17,10 +17,12 @@ const routes = [
   {
     path: '/home',
     component: Home,
+    redirect: '/mine',
     children: [
+      { path: '/myform', component: Myform },
       { path: '/welcome', component: Welcome },
       { path: '/mine', component: Mine },
-      { path: '/edit', component: Edit }
+      { path: '/edit', name: 'edit', component: Edit }
     ]
   }
 ]

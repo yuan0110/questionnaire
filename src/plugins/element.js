@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import draggable from 'vuedraggable'
 import {
   Pagination,
   Dialog,
@@ -79,6 +80,7 @@ import {
   Notification
 } from 'element-ui'
 
+Vue.use(draggable)
 Vue.use(Pagination)
 Vue.use(Dialog)
 Vue.use(Autocomplete)
