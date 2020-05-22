@@ -1,7 +1,7 @@
 <template>
     <el-container>
             <!-- 侧边栏 -->
-    <el-aside width="200px">
+    <el-aside width='15%'>
       <!-- 侧边栏菜单区 -->
       <span><br>您可以通过点击来生成题目<br>
       </span>
@@ -12,12 +12,12 @@
     <!-- 右侧内容主题 -->
     <el-main>
 
-    <h1>问卷标题： {{title}}</h1>
-    <draggable tag="ul"
-               :list="list"
+    <h1 style="text-align: center">问卷标题： {{title}}</h1>
+    <draggable tag="div"
+               v-model="Questionnaires[myindex].questions"
                v-bind="dragOptions"
                class="list-group"
-               handle=".handle"
+               @update="datadragEnd"
                @start="drag = true"
                @end="drag = false">
       <transition-group type="transition"
@@ -30,41 +30,30 @@
           <span class="close"
                 @click="removeAt(idx)">删</span>
         </li>-->
-        <el-card v-for="(q,index) in Questionnaires[myindex].questions" :key="index" :label="q.question">
+        <el-card class='list-group-item' v-for="(q,index) in Questionnaires[myindex].questions" :key="index">
+          <p v-if="q.type=='checkbox'" style="margin-top: 0;margin-bottom: 0">{{q.question}}</p>
+          <p v-if="(q.type=='radio')||(q.type=='input')" style="margin-top: 0">{{q.question}}</p>
           <el-input v-if="q.type=='input'" v-model="q.answer"></el-input>
-        <el-checkbox-group v-if="q.type=='checkbox'" v-model="q.answer">
-          <el-checkbox v-for="(c,index) in q.choices" :key="index" :label="c"></el-checkbox>
+        <el-checkbox-group  v-if="q.type=='checkbox'" v-model="q.answer">
+          <el-checkbox style="margin-top: 2%" v-for="(c,index) in q.choices" :key="index" :label="c"></el-checkbox>
         </el-checkbox-group>
-        <el-radio-group v-if="q.type=='radio'" v-model="q.answer">
-          <el-radio v-for="(c,index) in q.choices" :key="index" :label="c"></el-radio>
+        <el-radio-group  v-if="q.type=='radio'" v-model="q.answer">
+          <el-radio style="margin-top: 2%" v-for="(c,index) in q.choices" :key="index" :label="c"></el-radio>
         </el-radio-group>
         </el-card>
       </transition-group>
     </draggable>
-    <!--<el-form :model="Questionnaires[myindex] " >
-      <el-form-item v-for="(q,index) in Questionnaires[myindex].questions" :key="index" :label="q.question">
-        <el-input v-if="q.type=='input'" v-model="q.answer"></el-input>
-        <el-checkbox-group v-if="q.type=='checkbox'" v-model="q.answer">
-          <el-checkbox v-for="(c,index) in q.choices" :key="index" :label="c"></el-checkbox>
-        </el-checkbox-group>
-        <el-radio-group v-if="q.type=='radio'" v-model="q.answer">
-          <el-radio v-for="(c,index) in q.choices" :key="index" :label="c"></el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" >提交</el-button>
-        <el-button>取消</el-button></el-form-item>
-    </el-form>-->
-
     </el-main>
     </el-container>
 </template>
 
 <script>
+import draggable from 'vuedraggable'
 export default {
   data () {
     return {
       // myindex 被我选中的问卷索引
+      drag: false,
       myindex: '',
       title: '',
       Questionnaires: [
@@ -78,8 +67,8 @@ export default {
             },
             {
               type: 'radio',
-              question: '单选问题',
-              choices: ['选项1', '选项2'],
+              question: '您是否觉得宿舍不够干净？',
+              choices: ['非常', '一般', '否'],
               answer: ''
             },
             {
@@ -104,40 +93,131 @@ export default {
       ]
     }
   },
+  components: {
+    draggable
+  },
+  computed: {
+    dragOptions () {
+      return {
+        animation: 200, // 动画时间
+        disabled: false, // false可拖拽，true不可拖拽
+        group: 'description',
+        ghostClass: 'ghost'
+      }
+    }
+  },
   created () {
 
   },
   mounted () {
     this.myindex = this.$route.query.choose
     this.title = this.Questionnaires[this.myindex].title
+    // 为了防止火狐浏览器拖拽的时候以新标签打开，此代码真实有效
+    document.body.ondrop = function (event) {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+    var that = this
+    var elementResizeDetectorMaker = require('element-resize-detector')
+    const conelement = document.getElementsByClassName('el-container')[1]
+    console.log(conelement)
+    var erd = elementResizeDetectorMaker()
+    erd.listenTo(conelement, function (element) {
+      var height = element.scrollHeight
+      that.$nextTick(function () {
+        console.log('Size: ' + height)
+        window.scrollTo(0, conelement.scrollHeight)
+      })
+    })
   },
   methods: {
+    datadragEnd (evt) { // 拖动后整个questions数组的顺序也会变化，可提交至后台
+      evt.preventDefault()
+      console.log('拖动前的索引 :' + evt.oldIndex)
+      console.log('拖动后的索引 :' + evt.newIndex)
+      console.log(this.Questionnaires[this.myindex].questions[1].question)
+    },
     single () {
-      console.log('c')
+      this.Questionnaires[this.myindex].questions.push(
+        {
+          type: 'radio',
+          question: '单选问题',
+          choices: ['选项1', '选项2'],
+          answer: ''
+        }
+      )
     },
     multi () {
-      console.log('c')
+      this.Questionnaires[this.myindex].questions.push(
+        {
+          type: 'checkbox',
+          question: '多选问题',
+          choices: ['选项1', '选项2'],
+          answer: []
+        }
+      )
     },
     text () {
-      console.log('c')
+      this.Questionnaires[this.myindex].questions.push(
+        {
+          type: 'input',
+          question: '单行输入问题',
+          answer: ''
+        }
+      )
     }
-
   }
 }
 
 </script>
 
 <style lang="less" scoped>
-
+.el-card{
+  float: none;
+}
 .el-aside {
     border: 1px solid #eee;
-    background-color:"#ABD4ED";
+    background-color: #f7f8fa;
     text-align: center;
+    height: 100%;
+    position: fixed;
+    z-index: 999;
+    margin-top: 60px;
 }
 .el-main {
-    border: 1px solid #eee
+    border: 1px solid #eee;
+    margin-left: 15%;
 }
 .el-button {
   margin: 5px 0 0 0;
+}
+.flip-list-move {
+  transition: transform 0.5s;
+}
+.no-move {
+  transition: transform 0s;
+}
+
+.container {
+  width: 100%;
+  text-align: center;
+  .handle {
+    cursor: move;
+  }
+  .list-group {
+    margin-bottom: 50px;
+    .list-group-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 10px;
+      border: 1px solid #ccc;
+      height: 40px;
+      line-height: 40px;
+      width: 300px;
+      text-align: center;
+      color: #fff;
+      background: rgba(0, 0, 0, 0.6);
+    }
+  }
 }
 </style>

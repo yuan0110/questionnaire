@@ -75,6 +75,7 @@ export default {
       float: left;
   }
   .el-row {
+    margin-top: 60px;
     margin-bottom: 20px;
     width: 100%;
   }

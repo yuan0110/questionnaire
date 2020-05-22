@@ -62,7 +62,9 @@ export default {
         margin-left: 15px;
       }
     }
-
+    position: fixed;
+    width: 100%;
+    z-index: 500;
 }
 
 </style>
