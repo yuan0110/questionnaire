@@ -1,24 +1,15 @@
 # vue_project
 
-## Project setup
+## Project setup（在项目目录下）
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### 运行编辑与打包（使用vue3.0自带的ui）
 ```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
+vue ui
 ```
 
-### Lints and fixes files
-```
-npm run lint
-```
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
