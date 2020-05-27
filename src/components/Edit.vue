@@ -1,6 +1,16 @@
 <template>
     <el-container>
-            <!-- 侧边栏 -->
+      <!-- 子导航栏 -->
+    <el-header>
+      <el-menu :default-active="$route.path" class="el-menu-demo" mode="horizontal" :router="true">
+        <el-menu-item :index="editPath">编辑</el-menu-item>
+        <el-menu-item index="/welcome">投放</el-menu-item>
+        <el-menu-item index="/welcome">统计</el-menu-item>
+     </el-menu>
+    <el-button @click='preview(myindex)'>预览</el-button>
+    <el-button >开始回收</el-button>
+    </el-header>
+      <!-- 侧边栏 -->
     <el-aside width='15%'>
       <!-- 侧边栏菜单区 -->
       <span><br>您可以通过点击来生成题目<br>
@@ -45,6 +55,7 @@
     </draggable>
     </el-main>
     </el-container>
+
 </template>
 
 <script>
@@ -54,6 +65,7 @@ export default {
     return {
       // myindex 被我选中的问卷索引
       drag: false,
+      editPath: '',
       myindex: '',
       title: '',
       Questionnaires: [
@@ -107,11 +119,11 @@ export default {
     }
   },
   created () {
-
+    this.myindex = this.$route.params.id
+    this.title = this.Questionnaires[this.myindex].title
+    this.editPath = '/edit/' + this.myindex
   },
   mounted () {
-    this.myindex = this.$route.query.choose
-    this.title = this.Questionnaires[this.myindex].title
     // 为了防止火狐浏览器拖拽的时候以新标签打开，此代码真实有效
     document.body.ondrop = function (event) {
       event.preventDefault()
@@ -165,6 +177,10 @@ export default {
           answer: ''
         }
       )
+    },
+    // 预览
+    preview (index) {
+      this.$router.push({ path: '/myform/' + this.myindex })
     }
   }
 }
@@ -182,11 +198,12 @@ export default {
     height: 100%;
     position: fixed;
     z-index: 999;
-    margin-top: 60px;
+    margin-top: 120px;
 }
 .el-main {
     border: 1px solid #eee;
     margin-left: 15%;
+    margin-top: 120px;
 }
 .el-button {
   margin: 5px 0 0 0;
@@ -219,5 +236,25 @@ export default {
       background: rgba(0, 0, 0, 0.6);
     }
   }
+}
+.el-header {
+    background-color: #ffffff;
+    border: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    padding-left: 0;
+    align-items: center;
+    font-size: 20px;
+    margin-top: 60px;
+    > div{
+      display: flex;
+      align-items: center;
+      span{
+        margin-left: 15px;
+      }
+    }
+    position: fixed;
+    width: 100%;
+    z-index: 500;
 }
 </style>

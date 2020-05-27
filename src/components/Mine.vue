@@ -54,12 +54,7 @@ export default {
       }
     },
     edit (index) {
-      this.$router.push({
-        path: '/edit',
-        query: {
-          choose: index
-        }
-      })
+      this.$router.push({ path: '/edit/' + index })
     },
     create (index) {
       this.$router.push({
