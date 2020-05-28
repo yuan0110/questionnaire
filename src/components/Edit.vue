@@ -35,19 +35,22 @@
         <el-card class='list-group-item' v-for="(q,index) in Questionnaire.questions" :key="index">
           <span>{{(index+1)+'、  '}}</span>
           <el-button type="primary" icon="el-icon-delete" style='float:right;margin-left:5%' size="mini" round @click="deleteQuestion(index)"></el-button>
+          <el-button v-if="q.type!='input'" type="primary" icon="el-icon-plus" style='float:right;margin-left:5%' size="mini" round @click="addChoices(index)"></el-button>
           <el-button class="handle" type="primary" icon="el-icon-rank" style='float:right;margin-left:5%' size="mini" round></el-button>
           <el-input type="input" autosize v-model="q.question"></el-input>
           <div class="input_vr_icon" v-if="q.type=='input'" ></div>
-        <el-checkbox-group v-if="q.type=='checkbox'" v-model='q.answer'>
-          <el-checkbox v-for="(c,index) in q.choices" :key="index">
-            <el-input type="input" autosize v-model='q.choices[index]'><i slot="suffix" class="el-input__icon el-icon-close"></i></el-input>
+          <div v-if="q.type=='checkbox'">
+          <el-checkbox disabled v-for="(c,cindex) in q.choices" :key="cindex" :label="c">
+            <el-input type="input" autosize v-model='q.choices[cindex]'></el-input>
+            <el-button @click="deleteChoices(index, cindex)" class="el-input__icon el-icon-close"></el-button>
           </el-checkbox>
-        </el-checkbox-group>
-        <el-radio-group  v-if="q.type=='radio'" v-model='q.answer'>
-          <el-radio v-for="(c,index) in q.choices" :key="index">
-            <el-input type="input" autosize v-model='q.choices[index]'><i slot="suffix" class="el-input__icon el-icon-close"></i></el-input>
+          </div>
+          <div  v-if="q.type=='radio'">
+          <el-radio disabled v-for="(c,cindex) in q.choices" :key="cindex" :label="c">
+            <el-input type="input" autosize v-model='q.choices[cindex]'></el-input>
+            <el-button @click="deleteChoices(index, cindex)" class="el-input__icon el-icon-close"></el-button>
           </el-radio>
-        </el-radio-group>
+          </div>
         </el-card>
       </transition-group>
     </draggable>
@@ -124,6 +127,13 @@ export default {
     }
   },
   methods: {
+    addChoices (index) {
+      const cho = this.Questionnaire.questions[index].choices.length
+      this.Questionnaire.questions[index].choices.push('选项' + (cho + 1))
+    },
+    deleteChoices (index, cindex) {
+      this.Questionnaire.questions[index].choices.splice(cindex, 1)
+    },
     deleteQuestion (index) {
       this.Questionnaire.questions.splice(index, 1)
     },
@@ -182,6 +192,9 @@ export default {
 
 </script>
 <style>
+.el-card__body{
+  width:90%;
+}
 .el-card__body>.el-input>.el-input__inner{
   -web-kit-appearance: none;
   -moz-appearance: none;
@@ -191,15 +204,9 @@ export default {
   color: #6a6f77;
   outline: 0;
 }
-.el-radio__label>.el-input>.el-input__inner{
-    -web-kit-appearance: none;
-  -moz-appearance: none;
-  border: none;
-  color: #6a6f77;
-  outline: 0;
-}
+.el-radio__label>.el-input>.el-input__inner,
 .el-checkbox__label>.el-input>.el-input__inner{
-      -web-kit-appearance: none;
+    -web-kit-appearance: none;
   -moz-appearance: none;
   border: none;
   color: #6a6f77;
@@ -218,11 +225,18 @@ export default {
  }
 </style>
 <style lang="less" scoped>
-.el-radio-group {
+.el-radio,
+.el-checkbox {
   margin-left:5%;
 }
-.el-checkbox-group {
-  margin-left:5%;
+.el-checkbox__label>.el-button,
+.el-radio__label>.el-button{
+    border:none;
+}
+.el-checkbox__label>.el-button:hover,
+.el-radio__label>.el-button:hover{
+    background-color: #fff;
+    border:none;
 }
 .input_vr_icon {
    -moz-appearance: textfield-multiline;
@@ -239,16 +253,10 @@ export default {
 }*/
 .el-card {
   margin: 3% 0 0 5%;
-  .el-card__body {
-  width:100%;
   .el-input{
-  margin:0 0 0 5%;
-  padding:0 0 0 0;
+    margin:0 0 0 5%;
+    padding:0 0 0 0;
   }
-  }
-}
-.el-card__body {
-    width:100%;
 }
 .el-aside {
     border: 1px solid #eee;

@@ -67,7 +67,7 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-  .el-card{
+  .el-card {
       margin: 3% 0 0 5%;
       float: left;
   }
@@ -117,7 +117,6 @@ export default {
   .clearfix:after {
     clear: both
   }
-
   .box-card {
     width: 15%;
   }
