@@ -31,6 +31,7 @@
 export default {
   data () {
     return {
+      userName: '',
       question: [
         { id: 'sdfds', name: '问卷一', status: '未发布', time: '2020-5-20 12:00' },
         { id: 's', name: '问卷二', status: '已截止', time: '2020-5-20 12:00' }
@@ -38,7 +39,8 @@ export default {
     }
   },
   created () {
-
+    this.userName = this.$store.state.userName
+    console.log(this.userName)
   },
   methods: {
     logout () {
@@ -64,15 +66,17 @@ export default {
   }
 }
 </script>
-<style>
+<style lang="less" scoped>
   .el-card{
       margin: 3% 0 0 5%;
       float: left;
   }
   .el-row {
     margin-top: 60px;
+    background-color: #f7f8fa;
     margin-bottom: 20px;
     width: 100%;
+    z-index: 999;
   }
   .el-row:last-child {
     margin-bottom: 0;

@@ -33,7 +33,7 @@ export default {
       // 登录表单数据绑定对象
       loginForm: {
         username: '123',
-        password: '321321'
+        password: '123456'
       },
       // 表单验证规则对象
       loginFormRules: {
@@ -65,7 +65,10 @@ export default {
         console.log(res)
         window.sessionStorage.setItem('token', res.data.token)
         // 跳转到后台主页
-        this.$router.push('/home')
+        this.$store.state.userName = this.loginForm.username
+        this.$router.push({
+          path: 'home'
+        })
       })
     }
   }

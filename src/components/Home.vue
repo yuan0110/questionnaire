@@ -10,6 +10,7 @@
         <el-menu-item index="/mine">我的问卷</el-menu-item>
         <el-menu-item index="/welcome">客服中心</el-menu-item>
      </el-menu>
+      <p style="margin-right:0">{{"您好，"+userName}}</p>
       <el-button type="info" @click="logout">退出</el-button>
     </el-header>
     <!-- 页面主体区域 -->
@@ -23,18 +24,14 @@
 export default {
   data () {
     return {
-
+      userName: this.$store.state.userName
     }
-  },
-  created () {
-
   },
   methods: {
     logout () {
       window.sessionStorage.clear()
       this.$router.push('/login')
     }
-
   }
 }
 
