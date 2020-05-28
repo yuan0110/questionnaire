@@ -21,7 +21,7 @@
     </el-aside>
     <!-- 右侧内容主题 -->
     <el-main>
-    <el-input type="textarea" autosize v-model="Questionnaire.title"></el-input>
+    <el-input type="input" autosize v-model="Questionnaire.title"></el-input>
     <draggable tag="div"
                v-bind="dragOptions"
                class="list-group"
@@ -36,16 +36,16 @@
           <span>{{(index+1)+'、  '}}</span>
           <el-button type="primary" icon="el-icon-delete" style='float:right;margin-left:5%' size="mini" round @click="deleteQuestion(index)"></el-button>
           <el-button class="handle" type="primary" icon="el-icon-rank" style='float:right;margin-left:5%' size="mini" round></el-button>
-          <el-input type="textarea" autosize v-model="q.question"></el-input>
+          <el-input type="input" autosize v-model="q.question"></el-input>
           <div class="input_vr_icon" v-if="q.type=='input'" ></div>
         <el-checkbox-group v-if="q.type=='checkbox'" v-model='q.answer'>
           <el-checkbox v-for="(c,index) in q.choices" :key="index">
-            <el-input type="textarea" autosize v-model='q.choices[index]'><i slot="suffix" class="el-input__icon el-icon-close"></i></el-input>
+            <el-input type="input" autosize v-model='q.choices[index]'><i slot="suffix" class="el-input__icon el-icon-close"></i></el-input>
           </el-checkbox>
         </el-checkbox-group>
         <el-radio-group  v-if="q.type=='radio'" v-model='q.answer'>
           <el-radio v-for="(c,index) in q.choices" :key="index">
-            <el-input type="textarea" autosize v-model='q.choices[index]'><i slot="suffix" class="el-input__icon el-icon-close"></i></el-input>
+            <el-input type="input" autosize v-model='q.choices[index]'><i slot="suffix" class="el-input__icon el-icon-close"></i></el-input>
           </el-radio>
         </el-radio-group>
         </el-card>
@@ -182,7 +182,7 @@ export default {
 
 </script>
 <style>
-.el-card__body>.el-textarea>.el-textarea__inner{
+.el-card__body>.el-input>.el-input__inner{
   -web-kit-appearance: none;
   -moz-appearance: none;
   font-size: 1.2em;
@@ -191,21 +191,21 @@ export default {
   color: #6a6f77;
   outline: 0;
 }
-.el-radio__label>.el-textarea>.el-textarea__inner{
+.el-radio__label>.el-input>.el-input__inner{
     -web-kit-appearance: none;
   -moz-appearance: none;
   border: none;
   color: #6a6f77;
   outline: 0;
 }
-.el-checkbox__label>.el-textarea>.el-textarea__inner{
+.el-checkbox__label>.el-input>.el-input__inner{
       -web-kit-appearance: none;
   -moz-appearance: none;
   border: none;
   color: #6a6f77;
   outline: 0;
 }
-.el-main>.el-textarea>.el-textarea__inner{
+.el-main>.el-input>.el-input__inner{
   -web-kit-appearance: none;
   -moz-appearance: none;
   font-size: 1.4em;
@@ -226,7 +226,7 @@ export default {
 }
 .input_vr_icon {
    -moz-appearance: textfield-multiline;
-    -webkit-appearance: textarea;
+    -webkit-appearance: input;
     border: 1px solid gray;
     font: medium -moz-fixed;
     font: -webkit-small-control;
@@ -241,11 +241,14 @@ export default {
   margin: 3% 0 0 5%;
   .el-card__body {
   width:100%;
-  .el-textarea{
+  .el-input{
   margin:0 0 0 5%;
   padding:0 0 0 0;
   }
   }
+}
+.el-card__body {
+    width:100%;
 }
 .el-aside {
     border: 1px solid #eee;
