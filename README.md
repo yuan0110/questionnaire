@@ -5,7 +5,7 @@
 npm install
 ```
 
-### 运行编辑与打包（使用vue3.0自带的ui）
+### 运行编辑与打包（使用vue-cli3.0自带的ui）
 ```
 vue ui
 ```
