@@ -21,39 +21,51 @@
     </el-aside>
     <!-- 右侧内容主题 -->
     <el-main>
-    <el-input type="input" autosize v-model="Questionnaire.title"></el-input>
+    <el-input type="input" v-model="questionnaire.title"></el-input>
     <draggable tag="div"
                v-bind="dragOptions"
                class="list-group"
                handle=".handle"
-               v-model="Questionnaire.questions"
+               v-model="questionnaire.questions"
                @update="datadragEnd"
                @start="drag = true"
                @end="drag = false">
       <transition-group type="transition"
                         :name="!drag ? 'flip-list' : null">
-        <el-card class='list-group-item' v-for="(q,index) in Questionnaire.questions" :key="index">
+        <el-card class='list-group-item' v-for="(q,index) in questionnaire.questions" :key="index">
           <span>{{(index+1)+'、  '}}</span>
           <el-button type="primary" icon="el-icon-delete" style='float:right;margin-left:5%' size="mini" round @click="deleteQuestion(index)"></el-button>
           <el-button v-if="q.type!='input'" type="primary" icon="el-icon-plus" style='float:right;margin-left:5%' size="mini" round @click="addChoices(index)"></el-button>
           <el-button class="handle" type="primary" icon="el-icon-rank" style='float:right;margin-left:5%' size="mini" round></el-button>
-          <el-input type="input" autosize v-model="q.question"></el-input>
+          <el-input type="input"  v-model="q.question"></el-input>
           <div class="input_vr_icon" v-if="q.type=='input'" ></div>
           <div v-if="q.type=='checkbox'">
-          <el-checkbox disabled v-for="(c,cindex) in q.choices" :key="cindex" :label="c">
-            <el-input type="input" autosize v-model='q.choices[cindex]'></el-input>
+          <el-checkbox disabled v-for="(c,cindex) in q.choices" :key="cindex" :label="c+cindex">
+            <el-input type="input" v-model='q.choices[cindex]'></el-input>
             <el-button @click="deleteChoices(index, cindex)" class="el-input__icon el-icon-close"></el-button>
           </el-checkbox>
           </div>
           <div  v-if="q.type=='radio'">
-          <el-radio disabled v-for="(c,cindex) in q.choices" :key="cindex" :label="c">
-            <el-input type="input" autosize v-model='q.choices[cindex]'></el-input>
+          <el-radio disabled v-for="(c,cindex) in q.choices" :key="cindex" :label="c+cindex">
+            <el-input type="input" v-model='q.choices[cindex]'></el-input>
             <el-button @click="deleteChoices(index, cindex)" class="el-input__icon el-icon-close"></el-button>
           </el-radio>
           </div>
         </el-card>
       </transition-group>
     </draggable>
+    <div style="margin-bottom:5%" class="block">
+    <span style="margin-left:15%" class="demonstration">问卷截止时间:</span>
+    <el-date-picker
+      v-model="questionnaire.deadline"
+      type="datetime"
+      placeholder="选择日期时间"
+      align="right"
+      size="large"
+      :picker-options="pickerOptions">
+    </el-date-picker>
+    <el-button type="primary" style="margin-left:20%">发布并分享</el-button>
+    </div>
     </el-main>
     </el-container>
 
@@ -69,9 +81,11 @@ export default {
       editPath: '',
       userName: this.$store.state.userName,
       myindex: 0,
-      Questionnaire:
+      questionnaire:
         {
           title: '问卷标题',
+          status: '未发布',
+          deadline: new Date(),
           questions: [
             {
               type: 'input',
@@ -91,11 +105,35 @@ export default {
               answer: []
             }
           ]
-        }
+        },
+      pickerOptions: {
+        shortcuts: [{
+          text: '三天后',
+          onClick (picker) {
+            const date = new Date()
+            date.setTime(date.getTime() + 1 * 3600 * 1000 * 24)
+            picker.$emit('pick', date)
+          }
+        }, {
+          text: '一周后',
+          onClick (picker) {
+            const date = new Date()
+            date.setTime(date.getTime() + 7 * 3600 * 1000 * 24)
+            picker.$emit('pick', date)
+          }
+        }, {
+          text: '一月后',
+          onClick (picker) {
+            const date = new Date()
+            date.setTime(date.getTime() + 30 * 3600 * 1000 * 24)
+            picker.$emit('pick', date)
+          }
+        }]
+      }
     }
   },
   watch: {
-    Questionnaire: {
+    questionnaire: {
       handler: function (val, oldval) {
         console.log(val)
       },
@@ -118,6 +156,17 @@ export default {
   created () {
     this.myindex = this.$route.params.id
     this.editPath = '/edit/' + this.myindex
+    const getQuestionReq = {
+      userName: this.$store.state.userName,
+      index: this.myindex
+    }
+    console.log(getQuestionReq)
+    this.$http.post('getQuestionnaire', getQuestionReq).then(
+      response => {
+        this.questionnaire = response.data.data
+      }
+    ).catch(e => { console.log(e) })
+    this.questionnaire.deadline.setTime(this.questionnaire.deadline.getTime() + 1 * 3600 * 1000 * 24)
   },
   mounted () {
     // 为了防止火狐浏览器拖拽的时候以新标签打开，此代码真实有效
@@ -125,24 +174,25 @@ export default {
       event.preventDefault()
       event.stopPropagation()
     }
+    console.log(this.questionnaire.deadline)
   },
   methods: {
     addChoices (index) {
-      const cho = this.Questionnaire.questions[index].choices.length
-      this.Questionnaire.questions[index].choices.push('选项' + (cho + 1))
+      const cho = this.questionnaire.questions[index].choices.length
+      this.questionnaire.questions[index].choices.push('选项' + (cho + 1))
     },
     deleteChoices (index, cindex) {
-      this.Questionnaire.questions[index].choices.splice(cindex, 1)
+      this.questionnaire.questions[index].choices.splice(cindex, 1)
     },
     deleteQuestion (index) {
-      this.Questionnaire.questions.splice(index, 1)
+      this.questionnaire.questions.splice(index, 1)
     },
     datadragEnd (evt) { // 拖动后整个questions数组的顺序也会变化，可提交至后台
       evt.preventDefault()
-      console.log(this.Questionnaire.questions)
+      console.log(this.questionnaire.questions)
     },
     single () {
-      this.Questionnaire.questions.push(
+      this.questionnaire.questions.push(
         {
           type: 'radio',
           question: '单选问题',
@@ -156,7 +206,7 @@ export default {
       })
     },
     multi () {
-      this.Questionnaire.questions.push(
+      this.questionnaire.questions.push(
         {
           type: 'checkbox',
           question: '多选问题',
@@ -171,7 +221,7 @@ export default {
       })
     },
     text () {
-      this.Questionnaire.questions.push(
+      this.questionnaire.questions.push(
         {
           type: 'input',
           question: '单行输入问题',

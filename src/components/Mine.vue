@@ -9,9 +9,9 @@
     三种题型：单选、多选、文本框
   </div>
 </el-card>
-    <el-card  v-for="(q,index) in question" :key="q.id" class="box-card" shadow="hover">
+    <el-card  v-for="(q,index) in question" :key="index" class="box-card" shadow="hover">
   <div slot="header" class="clearfix">
-    <span>{{q.name}}</span>
+    <span>{{q.title}}</span>
     <i style="float: right; padding: 3px 0; margin:0 2px" class="el-icon-delete" @click='del(index)'></i>
     <i style="float: right; padding: 3px 0; margin:0 2px" class="el-icon-s-promotion" @click='changestatus(index)'></i>
     <i style="float: right; padding: 3px 0; margin:0 2px" class="el-icon-edit" @click="edit(index)"></i>
@@ -20,7 +20,7 @@
     {{'状态 ' + q.status }}
   </div>
   <div class="text item">
-    {{'截止时间 ' + q.time }}
+    {{'截止时间 ' + q.deadline }}
   </div>
 </el-card>
 </el-row>
@@ -31,15 +31,13 @@
 export default {
   data () {
     return {
-      userName: '',
       question: [
-        { id: 'sdfds', name: '问卷一', status: '未发布', time: '2020-5-20 12:00' },
-        { id: 's', name: '问卷二', status: '已截止', time: '2020-5-20 12:00' }
+        { title: '问卷一', status: '未发布', deadline: '2020-5-20 12:00' },
+        { title: '问卷二', status: '已截止', deadline: '2020-5-20 12:00' }
       ]
     }
   },
   created () {
-    this.userName = this.$store.state.userName
     console.log(this.userName)
   },
   methods: {
