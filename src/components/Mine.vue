@@ -17,30 +17,68 @@
     <i style="float: right; padding: 3px 0; margin:0 2px" class="el-icon-edit" @click="edit(index)"></i>
   </div>
   <div class="text item">
-    {{'状态 ' + q.status }}
+    <span style="color:#909399">状态: </span><span :class='{ isA:q.status=="未发布",isB:q.status=="已发布",isC:q.status=="已截止" }'>{{q.status }}</span>
   </div>
-  <div class="text item">
-    {{'截止时间 ' + q.deadline }}
+  <div class="text item" style="color:#409EFF">
+    <span style="color:#909399">截止时间: </span>{{ q.deadline===""?"无":formatUTC("YYYY-mm-dd HH:MM",q.deadline) }}
   </div>
 </el-card>
 </el-row>
 </template>
 
 <script>
-// import bus from '../components/Bus.js'
 export default {
   data () {
     return {
       question: [
-        { title: '问卷一', status: '未发布', deadline: '2020-5-20 12:00' },
-        { title: '问卷二', status: '已截止', deadline: '2020-5-20 12:00' }
       ]
     }
   },
   created () {
-    console.log(this.userName)
+    this.$http.post('getQuestionaireInfo', { userName: this.$store.state.userName }).then(
+      response => {
+        this.question = response.data.data
+        console.log(this.question)
+        console.log('请求问卷信息数组成功')
+      }
+    ).catch(e => { console.log(e) })
   },
   methods: {
+    formatUTC (fmt, utc) {
+      // 转为正常的时间格式 年-月-日 时:分:秒
+      const Tpos = utc.indexOf('T')
+      const Zpos = utc.indexOf('Z')
+      const day = utc.substr(0, Tpos)
+      const hours = utc.substr(Tpos + 1, Zpos - Tpos - 1)
+      const datetime = day + ' ' + hours // 2017-03-31 08:02:06
+
+      // 处理成为时间戳
+      let timeStamp = new Date(Date.parse(datetime)).getTime() / 1000
+
+      // 增加8个小时，北京时间比utc时间多八个时区
+      timeStamp = timeStamp + 8 * 60 * 60
+
+      // 时间戳转为时间
+      const date = new Date(parseInt(timeStamp) * 1000)
+      // 获取年月日时分秒值  slice(-2)过滤掉大于10日期前面的0
+      let ret
+      const opt = {
+        'Y+': date.getFullYear().toString(), // 年
+        'm+': (date.getMonth() + 1).toString(), // 月
+        'd+': date.getDate().toString(), // 日
+        'H+': date.getHours().toString(), // 时
+        'M+': date.getMinutes().toString(), // 分
+        'S+': date.getSeconds().toString() // 秒
+        // 有其他格式化字符需求可以继续添加，必须转化成字符串
+      }
+      for (const k in opt) {
+        ret = new RegExp('(' + k + ')').exec(fmt)
+        if (ret) {
+          fmt = fmt.replace(ret[1], (ret[1].length === 1) ? (opt[k]) : (opt[k].padStart(ret[1].length, '0')))
+        };
+      };
+      return fmt
+    },
     logout () {
       window.sessionStorage.clear()
       this.$router.push('/login')
@@ -57,14 +95,28 @@ export default {
       this.$router.push({ path: '/edit/' + index })
     },
     create (index) {
+      this.$http.post('createQuestionaire', { userName: this.$store.state.userName }).then(
+        response => {
+          console.log('创建问卷成功')
+        }
+      ).catch(e => { console.log(e) })
       this.$router.push({
-        path: '/edit' // 跳转路由
+        path: '/edit' + 0 // 跳转路由
       })
     }
   }
 }
 </script>
 <style lang="less" scoped>
+.isA{
+  color:#E6A23C;
+}
+.isB{
+  color:#67C23A;
+}
+.isC{
+  color:#F56C6C;
+}
   .el-card {
       margin: 3% 0 0 5%;
       float: left;
@@ -74,7 +126,6 @@ export default {
     background-color: #f7f8fa;
     margin-bottom: 20px;
     width: 100%;
-    z-index: 999;
   }
   .el-row:last-child {
     margin-bottom: 0;

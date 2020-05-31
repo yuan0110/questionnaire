@@ -83,28 +83,10 @@ export default {
       myindex: 0,
       questionnaire:
         {
-          title: '问卷标题',
-          status: '未发布',
-          deadline: new Date(),
-          questions: [
-            {
-              type: 'input',
-              question: '单行输入问题',
-              answer: []
-            },
-            {
-              type: 'radio',
-              question: '单选问题',
-              choices: ['选项1', '选项2'],
-              answer: []
-            },
-            {
-              type: 'checkbox',
-              question: '多选问题',
-              choices: ['选项1', '选项2'],
-              answer: []
-            }
-          ]
+          title: '',
+          status: '',
+          deadline: '',
+          questions: []
         },
       pickerOptions: {
         shortcuts: [{
@@ -135,7 +117,17 @@ export default {
   watch: {
     questionnaire: {
       handler: function (val, oldval) {
-        console.log(val)
+        // console.log(val)
+        const saveQuestionaireReq = {
+          userName: this.$store.state.userName,
+          index: this.myindex,
+          questionnaire: this.questionnaire
+        }
+        this.$http.post('saveQuestionaire', saveQuestionaireReq).then(
+          response => {
+            console.log('保存问卷：' + response.status)
+          }
+        ).catch(e => { console.log(e) })
       },
       deep: true// 对象内部的属性监听，也叫深度监听
     }
@@ -160,13 +152,13 @@ export default {
       userName: this.$store.state.userName,
       index: this.myindex
     }
-    console.log(getQuestionReq)
+    // console.log(getQuestionReq)
     this.$http.post('getQuestionnaire', getQuestionReq).then(
       response => {
         this.questionnaire = response.data.data
       }
     ).catch(e => { console.log(e) })
-    this.questionnaire.deadline.setTime(this.questionnaire.deadline.getTime() + 1 * 3600 * 1000 * 24)
+    // this.questionnaire.deadline.setTime(this.questionnaire.deadline.getTime() + 1 * 3600 * 1000 * 24)
   },
   mounted () {
     // 为了防止火狐浏览器拖拽的时候以新标签打开，此代码真实有效
@@ -189,7 +181,6 @@ export default {
     },
     datadragEnd (evt) { // 拖动后整个questions数组的顺序也会变化，可提交至后台
       evt.preventDefault()
-      console.log(this.questionnaire.questions)
     },
     single () {
       this.questionnaire.questions.push(
