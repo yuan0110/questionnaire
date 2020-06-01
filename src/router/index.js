@@ -3,18 +3,19 @@ import VueRouter from 'vue-router'
 import Login from '../components/Login.vue'
 import Home from '../components/Home.vue'
 import Welcome from '../components/Welcome.vue'
-// import Create from '../components/Create.vue'
+import Publish from '../components/publish.vue'
 import Mine from '../components/Mine.vue'
 import Edit from '../components/Edit.vue'
 import Myform from '../components/Myform.vue'
 import Stat from '../components/Stat.vue'
+import Navigation from '../components/Navigation.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
   { path: '/', redirect: '/login' },
   { path: '/login', component: Login },
-  { path: '/myform/:id', component: Myform },
+  { path: '/myform/:userName/:id', component: Myform },
   {
     path: '/home',
     component: Home,
@@ -22,8 +23,16 @@ const routes = [
     children: [
       { path: '/welcome', component: Welcome },
       { path: '/mine', component: Mine },
-      { path: '/edit/:id', component: Edit },
-      { path: '/stat/:id', component: Stat }
+      {
+        path: '/navigation/:id',
+        component: Navigation,
+        redirect: '/edit/:id',
+        children: [
+          { path: '/edit/:id', component: Edit },
+          { path: '/publish/:id', component: Publish },
+          { path: '/stat/:id', component: Stat }
+        ]
+      }
     ]
   }
 ]

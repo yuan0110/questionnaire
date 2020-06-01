@@ -1,17 +1,4 @@
 <template>
-    <el-container>
-      <!-- 子导航栏 -->
-    <el-header>
-      <el-menu :default-active="$route.path" class="el-menu-demo" mode="horizontal" :router="true">
-        <el-menu-item :index="editPath">编辑</el-menu-item>
-        <el-menu-item index="/welcome">投放</el-menu-item>
-        <el-menu-item :index="statPath">统计</el-menu-item>
-     </el-menu>
-    </el-header>
-
-    <!-- 右侧内容主题 -->
-    <el-main>
-
     <el-card class="box-card">
     <el-table
       :data="tableData"
@@ -48,8 +35,6 @@
     <ve-chart :data="chartDatas[index]" v-if="q.type!=='input'" :settings="chartSettings[index]"  style="border: 1px solid #eee;"></ve-chart>
     </div>
     </el-card>
-    </el-main>
-    </el-container>
 
 </template>
 
@@ -82,12 +67,9 @@ export default {
   components: {
   },
   computed: {
-
   },
   created () {
     this.myindex = this.$route.params.id
-    this.editPath = '/edit/' + this.myindex
-    this.statPath = '/stat/' + this.myindex
     this.getAnswer()
   },
   mounted () {
@@ -170,41 +152,12 @@ export default {
 <style lang="less" scoped>
 
 .el-card {
-  margin: 1% 5% 0 5%;
+  margin: 0% 5% 0 5%;
   padding: 10%;
 }
 
-.el-main {
-    border: 1px solid #eee;
-    margin-top: 120px;
-}
 .el-button {
   margin: 5px 0 0 0;
 }
-.el-container {
-  width: 100%;
-  .handle {
-    cursor: move;
-  }
-}
-.el-header {
-    background-color: #ffffff;
-    border: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-    padding-left: 0;
-    align-items: center;
-    font-size: 20px;
-    margin-top: 60px;
-    > div{
-      display: flex;
-      align-items: center;
-      span{
-        margin-left: 15px;
-      }
-    }
-    position: fixed;
-    width: 100%;
-    z-index: 500;
-}
+
 </style>

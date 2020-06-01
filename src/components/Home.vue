@@ -63,5 +63,4 @@ export default {
     width: 100%;
     z-index: 500;
 }
-
 </style>

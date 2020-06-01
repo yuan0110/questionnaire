@@ -1,7 +1,7 @@
 <template>
 <div>
 问卷标题： {{this.Questionnaire.title}}
-    <el-form :model="Questionnaires">
+    <el-form :model="Questionnaire">
       <el-form-item v-for="(q,index) in Questionnaire.questions" :key="index" :label="q.question">
         <el-input v-if="q.type=='input'" v-model="q.answer"></el-input>
         <el-checkbox-group v-if="q.type=='checkbox'" v-model="q.answer">
@@ -22,6 +22,7 @@ export default {
   data () {
     return {
       myindex: '',
+      userName: '',
       Questionnaire:
         {
           title: '问卷标题',
@@ -55,6 +56,30 @@ export default {
   },
   created () {
     this.myindex = this.$route.params.id
+    this.userName = this.$route.params.userName
+    console.log(this.userName + ' ' + this.myindex)
   }
 }
 </script>
+<style lang="less" scoped>
+.el-header {
+    background-color: #ffffff;
+    border: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    padding-left: 0;
+    align-items: center;
+    font-size: 20px;
+    margin-top: 60px;
+    position: fixed;
+    width: 100%;
+    z-index: 500;
+    > div{
+      display: flex;
+      align-items: center;
+      span{
+        margin-left: 15px;
+      }
+    }
+}
+</style>

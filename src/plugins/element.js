@@ -77,9 +77,11 @@ import {
   Loading,
   MessageBox,
   Message,
-  Notification
+  Notification,
+  Popconfirm
 } from 'element-ui'
 
+Vue.use(Popconfirm)
 Vue.use(Pagination)
 Vue.use(Dialog)
 Vue.use(Autocomplete)
