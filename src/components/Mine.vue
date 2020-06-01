@@ -38,13 +38,13 @@ export default {
     this.$http.post('getQuestionaireInfo', { userName: this.$store.state.userName }).then(
       response => {
         this.question = response.data.data
-        console.log(this.question)
         console.log('请求问卷信息数组成功')
       }
     ).catch(e => { console.log(e) })
   },
   methods: {
     formatUTC (fmt, utc) {
+      if (utc === undefined) return
       // 转为正常的时间格式 年-月-日 时:分:秒
       const Tpos = utc.indexOf('T')
       const Zpos = utc.indexOf('Z')
@@ -84,15 +84,33 @@ export default {
       this.$router.push('/login')
     },
     del (index) {
-      this.question.splice(index, 1)
+      this.$confirm('此操作将永久删除该问卷, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.question.splice(index, 1)
+        this.$http.post('deleteQuestionaire', { userName: this.$store.state.userName, index: index }).then(
+          response => {
+            console.log('删除问卷成功')
+          }
+        ).catch(e => { console.log(e) })
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     },
     changestatus (index) {
-      if (this.question[index].status === '未发布') {
-        this.question[index].status = '已发布'
-      }
+      this.$router.push({ path: '/publish/' + index })
     },
     edit (index) {
-      this.$router.push({ path: '/edit/' + index })
+      this.$router.push({ path: '/navigation/' + index })
     },
     create (index) {
       this.$http.post('createQuestionaire', { userName: this.$store.state.userName }).then(
@@ -101,7 +119,7 @@ export default {
         }
       ).catch(e => { console.log(e) })
       this.$router.push({
-        path: '/edit' + 0 // 跳转路由
+        path: '/navigation/' + 0 // 跳转路由
       })
     }
   }
@@ -126,6 +144,7 @@ export default {
     background-color: #f7f8fa;
     margin-bottom: 20px;
     width: 100%;
+    z-index:998;
   }
   .el-row:last-child {
     margin-bottom: 0;
@@ -169,4 +188,5 @@ export default {
   .box-card {
     width: 15%;
   }
+
 </style>

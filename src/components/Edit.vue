@@ -1,15 +1,5 @@
 <template>
     <el-container>
-      <!-- 子导航栏 -->
-    <el-header>
-      <el-menu :default-active="$route.path" class="el-menu-demo" mode="horizontal" :router="true">
-        <el-menu-item :index="editPath">编辑</el-menu-item>
-        <el-menu-item index="/welcome">投放</el-menu-item>
-        <el-menu-item index="/welcome">统计</el-menu-item>
-     </el-menu>
-    <el-button @click='preview(myindex)'>预览</el-button>
-    <el-button >开始回收</el-button>
-    </el-header>
       <!-- 侧边栏 -->
     <el-aside width='15%'>
       <!-- 侧边栏菜单区 -->
@@ -34,7 +24,9 @@
                         :name="!drag ? 'flip-list' : null">
         <el-card class='list-group-item' v-for="(q,index) in questionnaire.questions" :key="index">
           <span>{{(index+1)+'、  '}}</span>
-          <el-button type="primary" icon="el-icon-delete" style='float:right;margin-left:5%' size="mini" round @click="deleteQuestion(index)"></el-button>
+          <el-popconfirm title="这条问题确定删除吗？" v-on:onConfirm="deleteQuestion(index)">
+            <el-button slot="reference" type="primary" icon="el-icon-delete" style='float:right;margin-left:5%' size="mini" round></el-button>
+          </el-popconfirm>
           <el-button v-if="q.type!='input'" type="primary" icon="el-icon-plus" style='float:right;margin-left:5%' size="mini" round @click="addChoices(index)"></el-button>
           <el-button class="handle" type="primary" icon="el-icon-rank" style='float:right;margin-left:5%' size="mini" round></el-button>
           <el-input type="input"  v-model="q.question"></el-input>
@@ -64,7 +56,7 @@
       size="large"
       :picker-options="pickerOptions">
     </el-date-picker>
-    <el-button type="primary" style="margin-left:20%">发布并分享</el-button>
+    <el-button type="primary" style="margin-left:20%" @click="goToPublish()">发布并分享</el-button>
     </div>
     </el-main>
     </el-container>
@@ -78,7 +70,6 @@ export default {
     return {
       // myindex 被我选中的问卷索引
       drag: false,
-      editPath: '',
       userName: this.$store.state.userName,
       myindex: 0,
       questionnaire:
@@ -88,6 +79,8 @@ export default {
           deadline: '',
           questions: []
         },
+      getQuestionReq: {
+      },
       pickerOptions: {
         shortcuts: [{
           text: '三天后',
@@ -117,12 +110,27 @@ export default {
   watch: {
     questionnaire: {
       handler: function (val, oldval) {
-        // console.log(val)
+        var myDate = new Date()
+        myDate.toLocaleString()
+        // 对已发布和已截止的问卷进行状态更新
+        if (this.questionnaire.deadline != null) {
+          const line = new Date(this.questionnaire.deadline)
+          // 存储在后台以及当前时间都是使用国际标准时进行比较的，结果无误（即数据以UTC保存但是前端显示时为GMT北京时间）
+          if (line < myDate && this.questionnaire.status === '已发布') {
+            this.questionnaire.status = '已截止'
+          }
+          if (line > myDate && this.questionnaire.status === '已截止') {
+            this.questionnaire.status = '已发布'
+          }
+        } else { // 即不设定截止日期
+          if (this.questionnaire.status === '已截止') this.questionnaire.status = '已发布'
+        }
         const saveQuestionaireReq = {
           userName: this.$store.state.userName,
           index: this.myindex,
           questionnaire: this.questionnaire
         }
+
         this.$http.post('saveQuestionaire', saveQuestionaireReq).then(
           response => {
             console.log('保存问卷：' + response.status)
@@ -147,13 +155,11 @@ export default {
   },
   created () {
     this.myindex = this.$route.params.id
-    this.editPath = '/edit/' + this.myindex
-    const getQuestionReq = {
+    this.getQuestionReq = {
       userName: this.$store.state.userName,
       index: this.myindex
     }
-    // console.log(getQuestionReq)
-    this.$http.post('getQuestionnaire', getQuestionReq).then(
+    this.$http.post('getQuestionnaire', this.getQuestionReq).then(
       response => {
         this.questionnaire = response.data.data
       }
@@ -166,7 +172,6 @@ export default {
       event.preventDefault()
       event.stopPropagation()
     }
-    console.log(this.questionnaire.deadline)
   },
   methods: {
     addChoices (index) {
@@ -181,6 +186,49 @@ export default {
     },
     datadragEnd (evt) { // 拖动后整个questions数组的顺序也会变化，可提交至后台
       evt.preventDefault()
+    },
+    goToPublish () {
+      var myDate = new Date()
+      myDate.toLocaleString()
+      if (this.questionnaire.status === '未发布') {
+        const line = new Date(this.questionnaire.deadline)
+        if (line < myDate) {
+          this.$message({
+            type: 'info',
+            message: '当前截止时间低于当前时间，请修改截止时间'
+          })
+        } else {
+          this.$confirm('确定发布问卷?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            this.$http.post('publish', this.getQuestionReq).then(
+              response => {
+                this.$router.push({ path: '/publish/' + this.myindex })
+              }
+            ).catch(e => { console.log(e) })
+            this.$message({
+              type: 'success',
+              message: '发布成功!'
+            })
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消发布'
+            })
+          })
+        }
+      } else {
+        if (this.questionnaire.status === '已发布') {
+          this.$router.push({ path: '/publish/' + this.myindex })
+        } else {
+          this.$message({
+            type: 'info',
+            message: '当前问卷已截止，请修改截止时间'
+          })
+        }
+      }
     },
     single () {
       this.questionnaire.questions.push(
@@ -347,6 +395,9 @@ export default {
     align-items: center;
     font-size: 20px;
     margin-top: 60px;
+    position: fixed;
+    width: 100%;
+    z-index: 500;
     > div{
       display: flex;
       align-items: center;
@@ -354,8 +405,5 @@ export default {
         margin-left: 15px;
       }
     }
-    position: fixed;
-    width: 100%;
-    z-index: 500;
 }
 </style>
