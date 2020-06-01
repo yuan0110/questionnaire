@@ -7,6 +7,7 @@ import Welcome from '../components/Welcome.vue'
 import Mine from '../components/Mine.vue'
 import Edit from '../components/Edit.vue'
 import Myform from '../components/Myform.vue'
+import Stat from '../components/Stat.vue'
 
 Vue.use(VueRouter)
 
@@ -21,7 +22,8 @@ const routes = [
     children: [
       { path: '/welcome', component: Welcome },
       { path: '/mine', component: Mine },
-      { path: '/edit/:id', component: Edit }
+      { path: '/edit/:id', component: Edit },
+      { path: '/stat/:id', component: Stat }
     ]
   }
 ]

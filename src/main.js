@@ -9,7 +9,9 @@ import './assets/css/global.css'
 import axios from 'axios'
 import Vuex from 'vuex'
 import store from './vuex/store'
+import VCharts from 'v-charts'
 Vue.use(Vuex)
+Vue.use(VCharts)
 axios.defaults.baseURL = 'https://afeiog.toutiao15.com/'
 axios.interceptors.request.use(config => {
   // 为请求头对象，添加token验证的Authorization字段

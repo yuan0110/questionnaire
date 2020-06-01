@@ -30,8 +30,7 @@
 export default {
   data () {
     return {
-      question: [
-      ]
+      question: []
     }
   },
   created () {
@@ -166,6 +165,7 @@ export default {
   .clearfix:after {
     clear: both
   }
+
   .box-card {
     width: 15%;
   }

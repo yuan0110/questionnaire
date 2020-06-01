@@ -5,7 +5,7 @@
       <el-menu :default-active="$route.path" class="el-menu-demo" mode="horizontal" :router="true">
         <el-menu-item :index="editPath">编辑</el-menu-item>
         <el-menu-item index="/welcome">投放</el-menu-item>
-        <el-menu-item index="/welcome">统计</el-menu-item>
+        <el-menu-item :index="statPath">统计</el-menu-item>
      </el-menu>
     <el-button @click='preview(myindex)'>预览</el-button>
     <el-button >开始回收</el-button>
@@ -79,6 +79,7 @@ export default {
       // myindex 被我选中的问卷索引
       drag: false,
       editPath: '',
+      statPath: '',
       userName: this.$store.state.userName,
       myindex: 0,
       questionnaire:
@@ -159,6 +160,7 @@ export default {
       }
     ).catch(e => { console.log(e) })
     // this.questionnaire.deadline.setTime(this.questionnaire.deadline.getTime() + 1 * 3600 * 1000 * 24)
+    this.statPath = '/stat/' + this.myindex
   },
   mounted () {
     // 为了防止火狐浏览器拖拽的时候以新标签打开，此代码真实有效
@@ -183,12 +185,19 @@ export default {
       evt.preventDefault()
     },
     single () {
+      // 用空项补齐答案
+      var answer = []
+      if (this.questionnaire.questions[0]) {
+        for (var i = 0; i < this.questionnaire.questions[0].answer.length; i++) {
+          answer.push('')
+        }
+      }
       this.questionnaire.questions.push(
         {
           type: 'radio',
           question: '单选问题',
           choices: ['选项1', '选项2'],
-          answer: ''
+          answer: answer
         }
       )
       const conelement = document.getElementsByClassName('el-container')[1]
@@ -197,12 +206,19 @@ export default {
       })
     },
     multi () {
+      // 用空项补齐答案
+      var answer = []
+      if (this.questionnaire.questions[0]) {
+        for (var i = 0; i < this.questionnaire.questions[0].answer.length; i++) {
+          answer.push([])
+        }
+      }
       this.questionnaire.questions.push(
         {
           type: 'checkbox',
           question: '多选问题',
           choices: ['选项1', '选项2'],
-          answer: []
+          answer: answer
 
         }
       )
@@ -212,11 +228,18 @@ export default {
       })
     },
     text () {
+      // 用空项补齐答案
+      var answer = []
+      if (this.questionnaire.questions[0]) {
+        for (var i = 0; i < this.questionnaire.questions[0].answer.length; i++) {
+          answer.push('')
+        }
+      }
       this.questionnaire.questions.push(
         {
           type: 'input',
           question: '单行输入问题',
-          answer: ''
+          answer: answer
         }
       )
       const conelement = document.getElementsByClassName('el-container')[1]
