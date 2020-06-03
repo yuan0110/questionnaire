@@ -10,8 +10,8 @@
     <el-button @click='text()'>文本框</el-button>
     </el-aside>
     <!-- 右侧内容主题 -->
-    <el-main>
-    <el-input type="input" v-model="questionnaire.title"></el-input>
+    <el-main v-loading="loading">
+    <el-input type="input" v-model="questionnaire.title" onfocus="this.select()"></el-input>
     <draggable tag="div"
                v-bind="dragOptions"
                class="list-group"
@@ -29,17 +29,17 @@
           </el-popconfirm>
           <el-button v-if="q.type!='input'" type="primary" icon="el-icon-plus" style='float:right;margin-left:5%' size="mini" round @click="addChoices(index)"></el-button>
           <el-button class="handle" type="primary" icon="el-icon-rank" style='float:right;margin-left:5%' size="mini" round></el-button>
-          <el-input type="input"  v-model="q.question"></el-input>
+          <el-input type="input"  v-model="q.question" onfocus="this.select()"></el-input>
           <div class="input_vr_icon" v-if="q.type=='input'" ></div>
           <div v-if="q.type=='checkbox'">
           <el-checkbox disabled v-for="(c,cindex) in q.choices" :key="cindex" :label="c+cindex">
-            <el-input type="input" v-model='q.choices[cindex]'></el-input>
+            <el-input type="input" v-model='q.choices[cindex]' onfocus="this.select()"></el-input>
             <el-button @click="deleteChoices(index, cindex)" class="el-input__icon el-icon-close"></el-button>
           </el-checkbox>
           </div>
           <div  v-if="q.type=='radio'">
           <el-radio disabled v-for="(c,cindex) in q.choices" :key="cindex" :label="c+cindex">
-            <el-input type="input" v-model='q.choices[cindex]'></el-input>
+            <el-input type="input" v-model='q.choices[cindex]' onfocus="this.select()"></el-input>
             <el-button @click="deleteChoices(index, cindex)" class="el-input__icon el-icon-close"></el-button>
           </el-radio>
           </div>
@@ -68,7 +68,7 @@ import draggable from 'vuedraggable'
 export default {
   data () {
     return {
-      // myindex 被我选中的问卷索引
+      loading: true,
       drag: false,
       userName: this.$store.state.userName,
       myindex: 0,
@@ -162,10 +162,9 @@ export default {
     this.$http.post('getQuestionnaire', this.getQuestionReq).then(
       response => {
         this.questionnaire = response.data.data
+        this.loading = false
       }
     ).catch(e => { console.log(e) })
-    // this.questionnaire.deadline.setTime(this.questionnaire.deadline.getTime() + 1 * 3600 * 1000 * 24)
-    this.statPath = '/stat/' + this.myindex
   },
   mounted () {
     // 为了防止火狐浏览器拖拽的时候以新标签打开，此代码真实有效
@@ -311,7 +310,7 @@ export default {
   -moz-appearance: none;
   font-size: 1.2em;
   height: 2.9em;
-  border: none;
+  border:none;
   color: #6a6f77;
   outline: 0;
 }
@@ -336,6 +335,12 @@ export default {
  }
 </style>
 <style lang="less" scoped>
+.el-input{
+  border:1px solid  rgba(200,200,200,0);;
+}
+.el-input:hover{
+  border: 1px dotted lightblue;
+}
 .el-radio,
 .el-checkbox {
   margin-left:5%;

@@ -1,5 +1,8 @@
 <template>
-<el-row >
+<el-row v-loading="loading"
+    element-loading-text="拼命加载中"
+    element-loading-spinner="el-icon-loading"
+    element-loading-background="rgba(0, 0, 0, 0.8)">
   <el-card style="text-align:center" class="box-card" shadow="hover">
   <el-button type="text" @click='create()'>+新建</el-button>
   <div class="text item">
@@ -36,6 +39,7 @@
 export default {
   data () {
     return {
+      loading: true,
       question: []
     }
   },
@@ -43,6 +47,7 @@ export default {
     this.$http.post('getQuestionaireInfo', { userName: this.$store.state.userName }).then(
       response => {
         this.question = response.data.data
+        this.loading = false
         console.log('请求问卷信息数组成功')
       }
     ).catch(e => { console.log(e) })
