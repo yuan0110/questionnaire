@@ -46,8 +46,6 @@ export default {
   data () {
     return {
       // myindex 被我选中的问卷索引
-      editPath: '',
-      statPath: '',
       userName: this.$store.state.userName,
       myindex: 0,
       title: '',

@@ -8,7 +8,7 @@
         <el-menu-item :index="statPath">统计</el-menu-item>
      </el-menu>
     <el-button @click='preview(myindex)'>预览</el-button>
-    <el-button >开始回收</el-button>
+    <el-button @click='del(myindex)'>开始回收</el-button>
     </el-header>
     <router-view></router-view>
     </el-container>
@@ -35,6 +35,31 @@ export default {
     // 预览
     preview (index) {
       this.$router.push({ path: '/myform/' + this.$store.state.userName + '/' + this.myindex })
+    },
+    del (index) {
+      this.$confirm('此操作将永久删除该问卷, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$http.post('deleteQuestionaire', { userName: this.$store.state.userName, index: index }).then(
+          response => {
+            console.log('删除问卷成功')
+          }
+        ).catch(e => { console.log(e) })
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+        this.$router.push({
+          path: '/home'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     }
   }
 }

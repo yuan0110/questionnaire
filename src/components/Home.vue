@@ -55,6 +55,9 @@ export default {
     > div{
       display: flex;
       align-items: center;
+      > img{
+        height:60px;
+      }
       span{
         margin-left: 15px;
       }

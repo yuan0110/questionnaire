@@ -3,7 +3,7 @@
   <el-card style="text-align:center" class="box-card" shadow="hover">
   <el-button type="text" @click='create()'>+新建</el-button>
   <div class="text item">
-    无模板
+    <br>无模板
   </div>
   <div class="text item">
     三种题型：单选、多选、文本框
@@ -11,7 +11,13 @@
 </el-card>
     <el-card  v-for="(q,index) in question" :key="index" class="box-card" shadow="hover">
   <div slot="header" class="clearfix">
-    <span>{{q.title}}</span>
+    <span style="overflow: hidden;
+        text-overflow: ellipsis;
+        -o-text-overflow: ellipsis;
+        white-space:nowrap;
+        width:150px;
+        float:left;
+        display:block;">{{q.title}}</span>
     <i style="float: right; padding: 3px 0; margin:0 2px" class="el-icon-delete" @click='del(index)'></i>
     <i style="float: right; padding: 3px 0; margin:0 2px" class="el-icon-s-promotion" @click='changestatus(index)'></i>
     <i style="float: right; padding: 3px 0; margin:0 2px" class="el-icon-edit" @click="edit(index)"></i>
@@ -109,7 +115,29 @@ export default {
       this.$router.push({ path: '/publish/' + index })
     },
     edit (index) {
-      this.$router.push({ path: '/navigation/' + index })
+      if (this.question[index].status === '已发布') {
+        this.$confirm('对问卷进行编辑将使问卷状态变为未发布，需要重新发布, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http.post('setQuestionnaireStatus', { userName: this.$store.state.userName, index: index }).then(
+            response => {
+              console.log('重置状态成功')
+            }
+          ).catch(e => { console.log(e) })
+          this.$message({
+            type: 'success',
+            message: '问卷已变为未发布!'
+          })
+          this.$router.push({ path: '/navigation/' + index })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消编辑'
+          })
+        })
+      } else this.$router.push({ path: '/navigation/' + index })
     },
     create (index) {
       this.$http.post('createQuestionaire', { userName: this.$store.state.userName }).then(
@@ -143,7 +171,6 @@ export default {
     background-color: #f7f8fa;
     margin-bottom: 20px;
     width: 100%;
-    z-index:998;
   }
   .el-row:last-child {
     margin-bottom: 0;
@@ -168,7 +195,7 @@ export default {
     padding: 10px 0;
     background-color: #f9fafc;
   }
-    .text {
+  .text {
     font-size: 14px;
   }
 
@@ -176,17 +203,13 @@ export default {
     margin-bottom: 18px;
   }
 
-  .clearfix:before,
+  .el-row:last-child.clearfix:before,
   .clearfix:after {
     display: table;
     content: "";
   }
   .clearfix:after {
     clear: both
-  }
-
-  .box-card {
-    width: 15%;
   }
 
 </style>

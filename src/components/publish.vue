@@ -92,7 +92,6 @@ export default {
 .cover{
   margin-top:120px;
   background-color:#f7f8fa;
-  z-index:999;
   height:100%;
   >div{
     margin: 15% 35% 0 35%;
