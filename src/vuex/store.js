@@ -4,7 +4,8 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   // 定义状态
   state: {
-    userName: ''
+    userName: '',
+    passWord: ''
   }
 })
 

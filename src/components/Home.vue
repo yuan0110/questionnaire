@@ -29,7 +29,7 @@ export default {
   },
   methods: {
     logout () {
-      window.sessionStorage.clear()
+      window.sessionStorage.removeItem('token')
       this.$router.push('/login')
     }
   }

@@ -18,7 +18,19 @@ axios.interceptors.request.use(config => {
   config.headers.Authorization = window.sessionStorage.getItem('token')
   return config
 })
-
+// 添加响应拦截器
+axios.interceptors.response.use(
+  response => {
+    return response
+  },
+  error => {
+    console.log(error)
+    if (error.response.status === 401) {
+      window.sessionStorage.removeItem('token')
+      this.$router.push('/login')
+    }
+    return Promise.reject(error)
+  })
 Vue.prototype.$http = axios
 
 Vue.config.productionTip = false

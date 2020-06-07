@@ -1,5 +1,5 @@
 <template>
-    <div class="login_container">
+    <div class="login_container" v-loading="loading" element-loading-text="登录中......">
        <div class="login_box">
            <!-- 头像区域 -->
             <div class="avatar_box">
@@ -9,12 +9,12 @@
             <!-- 登陆表单区域 -->
             <el-form ref="loginFormRef" :model="loginForm" :rules="loginFormRules" label-width="0px" class="login_form" >
                 <!-- 用户名 -->
-                <el-form-item prop="username">
-                    <el-input v-model="loginForm.username" prefix-icon="iconfont icon-user"></el-input>
+                <el-form-item prop="userName">
+                    <el-input v-model="loginForm.userName" prefix-icon="iconfont icon-user"></el-input>
                 </el-form-item>
                 <!-- 密码 -->
-                <el-form-item prop="password">
-                    <el-input v-model="loginForm.password" prefix-icon="iconfont icon-3702mima" type="password"></el-input>
+                <el-form-item prop="passWord">
+                    <el-input v-model="loginForm.passWord" prefix-icon="iconfont icon-3702mima" type="passWord"></el-input>
                 </el-form-item>
                 <!-- 按钮区域 -->
                 <el-form-item class="btns">
@@ -32,23 +32,28 @@ export default {
     return {
       // 登录表单数据绑定对象
       loginForm: {
-        username: '123',
-        password: '123456'
+        userName: '',
+        passWord: ''
       },
       // 表单验证规则对象
       loginFormRules: {
         // 验证用户名是否合法
-        username: [
+        userName: [
           { required: true, message: '请输入登录名称', trigger: 'blur' },
           { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
         ],
         // 验证密码是否合法
-        password: [
+        passWord: [
           { required: true, message: '请输入登录名称', trigger: 'blur' },
           { min: 6, max: 15, message: '长度在 6 到 15 个字符', trigger: 'blur' }
         ]
-      }
+      },
+      loading: false
     }
+  },
+  created () {
+    this.loginForm.userName = this.$store.state.userName
+    this.loginForm.passWord = this.$store.state.passWord
   },
   methods: {
     // 点击重置按钮，重置登录表单
@@ -57,15 +62,24 @@ export default {
     },
     // 登录按钮
     login () {
+      this.loading = true
       this.$refs.loginFormRef.validate(async valid => {
         if (!valid) return
         const res = await this.$http.post('login', this.loginForm)
-        if (res.status !== 200) return this.$message.error('登陆失败')
+        if (res.status !== 200) {
+          this.resetLoginForm()
+          return this.$message.error('登陆请求失败失败,请重新输入账号')
+        }
+        if (res.data.token === '') {
+          return this.$message.error('密码错误,请重新输入密码')
+        }
         this.$message.success({ message: '登陆成功', duration: 1000 })
         console.log(res)
         window.sessionStorage.setItem('token', res.data.token)
         // 跳转到后台主页
-        this.$store.state.userName = this.loginForm.username
+        this.$store.state.userName = this.loginForm.userName
+        this.$store.state.passWord = this.loginForm.passWord
+        this.loading = false
         this.$router.push({
           path: 'home'
         })
