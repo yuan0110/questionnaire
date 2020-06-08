@@ -26,13 +26,18 @@
 
     </el-table>
 
-    <el-radio-group v-model="chartSettings[index].type" v-if="q.type!=='input'"  style="margin-bottom: 30px;">
+    <el-radio-group v-model="chartSettings[index].type" v-if="q.type!=='input'"   style="margin-bottom: 30px;">
     <el-radio-button label="pie">饼图</el-radio-button>
     <el-radio-button label="line">折线图</el-radio-button>
     <el-radio-button label="histogram">柱状图</el-radio-button>
     </el-radio-group>
 
-    <ve-chart :data="chartDatas[index]" v-if="q.type!=='input'" :settings="chartSettings[index]"  style="border: 1px solid #eee;"></ve-chart>
+    <ve-chart :data="chartDatas[index]"
+    v-if="q.type!=='input'"
+    :settings="chartSettings[index]"
+    style="border: 1px solid #eee;"
+    :extend="extend"
+    ></ve-chart>
     </div>
     </el-card>
 
@@ -52,7 +57,16 @@ export default {
       questions: [],
       tableData: [],
       chartDatas: [],
-      chartSettings: []
+      chartSettings: [],
+      extend: {
+        // 每个柱子
+        series (v) {
+          v.forEach(i => {
+            i.barWidth = 40
+          })
+          return v
+        }
+      }
     }
   },
   watch: {
@@ -140,7 +154,9 @@ export default {
       }
       // 图表选择初始化
       for (i = 0; i < this.questions.length; i++) {
-        this.chartSettings.push({ type: 'pie' })
+        this.chartSettings.push({
+          type: 'pie'
+        })
       }
     }
   }

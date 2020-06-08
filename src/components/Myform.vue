@@ -3,16 +3,16 @@
 问卷标题： {{this.Questionnaire.title}}
     <el-form :model="Questionnaire">
       <el-form-item v-for="(q,index) in Questionnaire.questions" :key="index" :label="q.question">
-        <el-input v-if="q.type=='input'" v-model="q.answer"></el-input>
-        <el-checkbox-group v-if="q.type=='checkbox'" v-model="q.answer">
+        <el-input v-if="q.type=='input'" v-model="answers.questions[index].answer[0]"></el-input>
+        <el-checkbox-group v-if="q.type=='checkbox'" v-model="answers.questions[index].answer[0]">
           <el-checkbox v-for="(c,index) in q.choices" :key="index" :label="c"></el-checkbox>
         </el-checkbox-group>
-        <el-radio-group v-if="q.type=='radio'" v-model="q.answer">
+        <el-radio-group v-if="q.type=='radio'" v-model="answers.questions[index].answer[0]">
           <el-radio v-for="(c,index) in q.choices" :key="index" :label="c"></el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="submitForm">提交</el-button>
+        <el-button type="primary" @click="submitAnswer">提交</el-button>
         <el-button>取消</el-button></el-form-item>
     </el-form>
     </div>
@@ -23,41 +23,37 @@ export default {
     return {
       myindex: '',
       userName: '',
-      Questionnaire:
-        {
-          title: '问卷标题',
-          questions: [
-            {
-              type: 'input',
-              question: '单行输入问题',
-              answer: []
-            },
-            {
-              type: 'radio',
-              question: '单选问题',
-              choices: ['选项1', '选项2'],
-              answer: []
-            },
-            {
-              type: 'checkbox',
-              question: '多选问题',
-              choices: ['选项1', '选项2'],
-              answer: []
-            }
-          ]
-        }
+      Questionnaire: {},
+      answers: { questions: [] }
     }
   },
   methods: {
-    submitForm () {
-      this.$message.success({ message: '提交', duration: 1000 })
+    async submitAnswer () {
+      const { data: res } = await this.$http.post('submitAnswer', {
+        index: this.myindex, userName: this.userName, answers: this.answers
+      })
+      console.log(res)
+      console.log(this.answers)
+    },
+    async getQuestionnaire () {
+      const { data: res } = await this.$http.post('getQuestionnaire', {
+        index: this.myindex, userName: this.userName
+      })
+      this.Questionnaire = res.data
+      for (var i = 0; i < this.Questionnaire.questions.length; i++) {
+        if (this.Questionnaire.questions[i].type === 'checkbox') {
+          this.answers.questions.push({ answer: [[]] })
+        } else {
+          this.answers.questions.push({ answer: [''] })
+        }
+      }
     }
 
   },
   created () {
     this.myindex = this.$route.params.id
     this.userName = this.$route.params.userName
-    console.log(this.userName + ' ' + this.myindex)
+    this.getQuestionnaire()
   }
 }
 </script>
