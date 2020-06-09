@@ -1,24 +1,27 @@
 <template>
       <!-- 子导航栏 -->
     <div class="cover">
-    <div v-if="status=='已发布'">
-        <p>请复制以下链接进行分享</p>
+    <div v-show="status=='已发布'">
+        <p>请复制以下链接进行分享或扫描二维码</p>
         <el-input disabled v-model="url">
             <el-button style="background-color:#91E3BE" slot="append" class="el-icon-tickets" @click="copy()"></el-button>
         </el-input>
+        <div id="qrcode"></div>
     </div>
-    <div v-if="status=='未发布'">
+    <div v-show="status=='未发布'">
         <el-button type="primary" @click="pub()">发布并分享</el-button>
     </div>
     </div>
 </template>
 <script>
+import QRCode from 'qrcodejs2'
 export default {
   data () {
     return {
       status: '',
       url: '',
-      getQuestionnaireStatusReq: {}
+      getQuestionnaireStatusReq: {},
+      deadline: ''
     }
   },
   created () {
@@ -31,12 +34,26 @@ export default {
     this.$http.post('getQuestionnaireStatus', this.getQuestionnaireStatusReq).then(
       response => {
         this.status = response.data.data
-        console.log(this.status)
+      }
+    ).catch(e => { console.log(e) })
+    this.$http.post('getQuestionnaire', this.getQuestionnaireStatusReq).then(
+      response => {
+        this.deadline = response.data.data.deadline
+        console.log(this.deadline)
       }
     ).catch(e => { console.log(e) })
   },
   mounted () {
-
+    const that = this
+    this.$nextTick(() => {
+      // 为id为qrcode的tag绑定一个二维码图
+      const q = new QRCode('qrcode', {
+        width: 200, // 二维码宽度，单位像素
+        height: 200, // 二维码高度，单位像素
+        text: that.url // 生成二维码的链接
+      })
+      console.log(q)
+    })
   },
   methods: {
     copy () {
@@ -56,7 +73,7 @@ export default {
     pub () {
       var myDate = new Date()
       myDate.toLocaleString()
-      const line = new Date(this.questionnaire.deadline)
+      const line = new Date(this.deadline)
       if (line < myDate) {
         this.$message({
           type: 'info',
@@ -94,11 +111,16 @@ export default {
   background-color:#f7f8fa;
   height:100%;
   >div{
-    margin: 15% 35% 0 35%;
+    margin: 10% 35% 0 35%;
     text-align:center;
     >.el-input>.el-input__inner{
       background-color: #D3F2E4;
     }
   }
+}
+#qrcode{
+  display:flex;
+  justify-content: center;
+  margin-top:2%;
 }
 </style>

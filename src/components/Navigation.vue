@@ -3,7 +3,7 @@
       <!-- 子导航栏 -->
     <el-header>
       <el-menu :default-active="$route.path" class="el-menu-demo" mode="horizontal" :router="true">
-        <el-menu-item :index="editPath">编辑</el-menu-item>
+        <el-menu-item @click="con(myindex)">编辑</el-menu-item>
         <el-menu-item :index="publishPath">投放</el-menu-item>
         <el-menu-item :index="statPath">统计</el-menu-item>
      </el-menu>
@@ -32,6 +32,40 @@ export default {
     this.statPath = '/stat/' + this.myindex
   },
   methods: {
+    async con (index) {
+      let status = ''
+      const res = await this.$http.post('getQuestionnaireStatus', { userName: this.$store.state.userName, index: index }).then(
+        response => {
+          console.log(response)
+          status = response.data.data
+          console.log(this.status)
+        }
+      ).catch(e => { console.log(e) })
+      console.log(res)
+      if (status === '已发布') {
+        this.$confirm('对问卷进行编辑将使问卷状态变为未发布，需要重新发布, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http.post('setQuestionnaireStatus', { userName: this.$store.state.userName, index: index }).then(
+            response => {
+              console.log('重置状态成功')
+            }
+          ).catch(e => { console.log(e) })
+          this.$message({
+            type: 'success',
+            message: '问卷已变为未发布!'
+          })
+          this.$router.push({ path: '/edit/' + this.myindex })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消编辑'
+          })
+        })
+      }
+    },
     // 预览
     preview (index) {
       this.$router.push({ path: '/myform/' + this.$store.state.userName + '/' + this.myindex })

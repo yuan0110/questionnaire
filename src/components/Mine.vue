@@ -12,7 +12,8 @@
     三种题型：单选、多选、文本框
   </div>
 </el-card>
-    <el-card  v-for="(q,index) in question" :key="index" class="box-card" shadow="hover">
+  <el-tooltip v-for="(q,index) in question" :key="index" effect="light" content="点击查看已收集数据" placement="left" @click.native="gotoStat(index)">
+    <el-card  class="box-card" shadow="hover">
   <div slot="header" class="clearfix">
     <span style="overflow: hidden;
         text-overflow: ellipsis;
@@ -21,9 +22,9 @@
         width:150px;
         float:left;
         display:block;">{{q.title}}</span>
-    <i style="float: right; padding: 3px 0; margin:0 2px" class="el-icon-delete" @click='del(index)'></i>
-    <i style="float: right; padding: 3px 0; margin:0 2px" class="el-icon-s-promotion" @click='changestatus(index)'></i>
-    <i style="float: right; padding: 3px 0; margin:0 2px" class="el-icon-edit" @click="edit(index)"></i>
+    <i style="float: right; padding: 3px 0; margin:0 2px" class="el-icon-delete" @click.stop='del(index)'></i>
+    <i style="float: right; padding: 3px 0; margin:0 2px" class="el-icon-s-promotion" @click.stop='changestatus(index)'></i>
+    <i style="float: right; padding: 3px 0; margin:0 2px" class="el-icon-edit" @click.stop="edit(index)"></i>
   </div>
   <div class="text item">
     <span style="color:#909399">状态: </span><span :class='{ isA:q.status=="未发布",isB:q.status=="已发布",isC:q.status=="已截止" }'>{{q.status }}</span>
@@ -32,6 +33,7 @@
     <span style="color:#909399">截止时间: </span>{{ q.deadline===""?"无":formatUTC("YYYY-mm-dd HH:MM",q.deadline) }}
   </div>
 </el-card>
+</el-tooltip>
 </el-row>
 </template>
 
@@ -53,6 +55,10 @@ export default {
     ).catch(e => { console.log(e) })
   },
   methods: {
+    gotoStat (index) {
+      console.log('这里有goto')
+      this.$router.push({ path: '/stat/' + index })
+    },
     formatUTC (fmt, utc) {
       if (utc === undefined) return
       // 转为正常的时间格式 年-月-日 时:分:秒
@@ -205,7 +211,7 @@ export default {
   }
 
   .item {
-    margin-bottom: 18px;
+    margin-bottom: 20px;
   }
 
   .el-row:last-child.clearfix:before,
